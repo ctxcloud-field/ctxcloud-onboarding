@@ -163,7 +163,7 @@ providers=(
   "Microsoft.Security"
   "Microsoft.Aadiam"
   "Microsoft.Communication"
-  "Microsoft.Datadog"
+  #"Microsoft.Datadog"
 )
 
 for p in "${providers[@]}"; do

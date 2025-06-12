@@ -41,8 +41,8 @@ function Test-AzCortexProviders {
         "Microsoft.EventHub",
         "Microsoft.Security",
         "Microsoft.Aadiam",
-        "Microsoft.Communication",
-        "Microsoft.Datadog"
+        "Microsoft.Communication"
+        #"Microsoft.Datadog"
     )
 
     foreach ($provider in $providers) {

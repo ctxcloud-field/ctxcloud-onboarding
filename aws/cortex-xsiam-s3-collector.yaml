@@ -1,0 +1,92 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: S3 Collector Setup for Cortex XSIAM — without modifying existing bucket.
+
+Parameters:
+  CortexAWSAccountId:
+    Type: String
+    Description: Cortex XSIAM AWS Account ID (e.g., 006742885340)
+  ExternalId:
+    Type: String
+    Description: External ID provided by Cortex for cross-account access
+  CloudTrailBucketName:
+    Type: String
+    Description: Name of your existing CloudTrail S3 bucket
+  KMSKeyARN:
+    Type: String
+    Default: ""
+    Description: (Optional) ARN of KMS key used to encrypt logs
+
+Resources:
+
+  CortexS3IngestQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: cortex-s3-cloudtrail-ingest
+      VisibilityTimeout: 60
+
+  S3ToSQSQueuePolicy:
+    Type: AWS::SQS::QueuePolicy
+    Properties:
+      Queues:
+        - !Ref CortexS3IngestQueue
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: AllowS3SendMessage
+            Effect: Allow
+            Principal:
+              Service: s3.amazonaws.com
+            Action: sqs:SendMessage
+            Resource: !GetAtt CortexS3IngestQueue.Arn
+            Condition:
+              ArnLike:
+                aws:SourceArn: !Sub arn:aws:s3:::${CloudTrailBucketName}
+
+  CortexXSIAMIngestRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: cortex-xsiam-ingest-role
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS: !Ref CortexAWSAccountId
+            Action: sts:AssumeRole
+            Condition:
+              StringEquals:
+                sts:ExternalId: !Ref ExternalId
+      Policies:
+        - PolicyName: CortexXSIAMS3IngestPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:ListBucket
+                Resource:
+                  - !Sub arn:aws:s3:::${CloudTrailBucketName}
+                  - !Sub arn:aws:s3:::${CloudTrailBucketName}/*
+              - Effect: Allow
+                Action:
+                  - sqs:ReceiveMessage
+                  - sqs:DeleteMessage
+                  - sqs:GetQueueAttributes
+                  - sqs:ChangeMessageVisibility
+                Resource: !GetAtt CortexS3IngestQueue.Arn
+              - Effect: Allow
+                Action:
+                  - kms:Decrypt
+                Resource: !Ref KMSKeyARN
+                Condition:
+                  StringNotEqualsIfExists:
+                    kms:ViaService: "s3.${AWS::Region}.amazonaws.com"
+
+Outputs:
+  SQSQueueURL:
+    Description: URL of the created SQS queue
+    Value: !Ref CortexS3IngestQueue
+  IAMRoleARN:
+    Description: ARN of the IAM role for Cortex to assume
+    Value: !GetAtt CortexXSIAMIngestRole.Arn
