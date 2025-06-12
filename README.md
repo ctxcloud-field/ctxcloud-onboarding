@@ -1,8 +1,8 @@
 # ☁️ ctxcloud-onboarding
 
-Scripts to streamline and validate onboarding for **Palo Alto Networks Cortex Cloud**, covering **Azure** and **AWS** environments.
+Scripts to streamline and validate onboarding for **Cortex Cloud** by **Palo Alto Networks**, supporting both **Azure** and **AWS** environments.
 
-These tools help validate permissions, provider registrations, diagnostic settings, and deployment prerequisites across Cortex Cloud’s **Posture Management**, **Runtime Security**, and **XSIAM** log ingestion use cases.
+These tools help validate permissions, resource provider registrations, diagnostic settings, and deployment readiness for Cortex Cloud’s **Cloud Posture Security**, **Cloud Runtime Security**, and XSIAM's **S3 Bucket log collection** modules.
 
 ---
 
@@ -14,7 +14,7 @@ ctxcloud-onboarding/
 │   └── cortex-xsiam-s3-collector.yaml        # CloudFormation template for XSIAM S3 log ingestion
 ├── azure/
 │   ├── az-runtime-perms-check.sh             # Bash-based Runtime permission checker
-│   ├── Start-AzCortexOnboarding.ps1          # Combined PowerShell runner
+│   ├── Start-AzCortexOnboarding.ps1          # PowerShell deployment script using wizard template
 │   ├── Test-AzCortexProviders.ps1            # Provider registration validation
 │   └── Test-AzCortexRuntimePermissions.ps1   # RBAC + permission analysis
 ├── LICENSE
@@ -29,30 +29,31 @@ ctxcloud-onboarding/
 
 Checks whether the current Azure CLI user:
 
-* Is a **Global Admin** in Entra ID
+* Is a **Global Administrator** in Entra ID
 * Has role assignments at both **Subscription** and **Root Management Group**
-* Has wildcard permissions for key services used by **Cortex Runtime Security**
+* Has wildcard permissions across services required by **Cortex Runtime Security**
 * Has all required **Azure Resource Providers** registered
 
 **Usage:**
 
 ```bash
 cd azure
-chmod +x az-runtime-perms-check.sh
-./az-runtime-perms-check.sh
+bash az-runtime-perms-check.sh
 ```
 
-> Designed for Bash 3.x (e.g., macOS default). No `jq` or external dependencies required.
+> Designed for Bash 3.x (e.g., macOS default). No jq or external dependencies required.
 
 ---
 
 ### `Test-AzCortexRuntimePermissions.ps1`
 
-PowerShell version of the permission validator:
+PowerShell version of the runtime permissions checker. It:
 
-* Validates wildcard permissions per Azure service category
-* Shows roles granted at root and subscription levels
-* Can be extended to export reports or run in pipelines
+* Validates wildcard access to critical Azure services
+* Checks roles assigned at both subscription and management group level
+* Can be extended to export results
+
+**Usage:**
 
 ```powershell
 cd azure
@@ -63,7 +64,9 @@ cd azure
 
 ### `Test-AzCortexProviders.ps1`
 
-Checks registration status for all Azure resource providers needed by Cortex Cloud and prompts for registration if needed.
+Checks if required Azure **Resource Providers** are registered (e.g., `Microsoft.Compute`, `Microsoft.Storage`, etc.). Optionally prompts to register missing providers.
+
+**Usage:**
 
 ```powershell
 cd azure
@@ -74,11 +77,20 @@ cd azure
 
 ### `Start-AzCortexOnboarding.ps1`
 
-Convenience wrapper that runs both of the above PowerShell checks.
+This script is the **PowerShell equivalent** of the onboarding wizard’s default `main.sh`. It validates the environment and deploys the **ARM template** for Cortex Cloud onboarding.
+
+**Requirements:**
+
+* `template.json` – downloaded from the Cortex Cloud onboarding wizard
+* `parameters.json` – also from the wizard
+
+> ✅ **For convenience**, copy both `template.json` and `parameters.json` into the same directory as this script before running.
+
+**Usage:**
 
 ```powershell
 cd azure
-.\Start-AzCortexOnboarding.ps1
+.\Start-AzCortexOnboarding.ps1 -TemplateFile ./template.json -ParametersFile ./parameters.json
 ```
 
 ---
@@ -87,37 +99,35 @@ cd azure
 
 ### `cortex-xsiam-s3-collector.yaml`
 
-CloudFormation template for setting up the **S3 + SQS + IAM** integration needed to forward **CloudTrail logs to Cortex XSIAM**.
+CloudFormation template for setting up the **S3 + SQS + IAM role** integration needed to forward **CloudTrail logs to Cortex XSIAM**.
 
 **Resources Deployed:**
 
 * SQS queue for log delivery
-* IAM Role (with external ID support) granting Cortex access
-* SQS policy for S3 bucket to push events
+* IAM Role with external ID support
+* SQS policy for bucket-to-queue delivery
 
-**Parameters Required:**
+**Parameters:**
 
 * `CortexAWSAccountId`
 * `ExternalId`
 * `CloudTrailBucketName`
 * (Optional) `KMSKeyARN`
 
-Use this template when integrating AWS logs with **XSIAM Data Collector (S3 Source)**.
-
 ---
 
 ## 🔐 Requirements
 
-* **Azure**: Logged in via `az login` or `Connect-AzAccount`; permissions at both Subscription + MG level
-* **AWS**: Access to deploy CF templates in the logging account; existing CloudTrail bucket required
+* **Azure**: Must be logged in (`az login` or `Connect-AzAccount`), with permissions at both Subscription and Management Group scope
+* **AWS**: Admin access to the account that owns the CloudTrail bucket
 
 ---
 
 ## 🙋‍♂️ Author & Support
 
-These scripts were created by [@adilio](https://github.com/adilio) as part of field testing and Cortex Cloud onboarding troubleshooting.
+These scripts were written by [@adilio](https://github.com/adilio) as part of testing and troubleshooting Cortex Cloud onboarding.
 
-> These tools are **not officially supported by Palo Alto Networks**, and come **as-is with no warranty or guarantees**. Use them as guidance or reference, not production-certified solutions.
+> These tools are **not officially affiliated with or supported by Palo Alto Networks**, and are provided **as-is, without warranty**. Use them as references or helpers, not production-certified solutions.
 
 ---
 
@@ -126,7 +136,7 @@ These scripts were created by [@adilio](https://github.com/adilio) as part of fi
 Contributions are welcome!
 
 * Open [issues](https://github.com/ctxcloud-field/ctxcloud-onboarding/issues) or submit [pull requests](https://github.com/ctxcloud-field/ctxcloud-onboarding/pulls)
-* If you’re a Palo Alto Networks employee, feel free to reach out to **@adilio internally** to collaborate or contribute
+* If you’re a **Palo Alto Networks** colleague, feel free to reach out to **@adilio internally** if you’d like to collaborate
 
 ---
 
