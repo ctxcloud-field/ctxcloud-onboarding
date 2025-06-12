@@ -90,7 +90,7 @@ This script is the **PowerShell equivalent** of the onboarding wizard’s defaul
 
 ```powershell
 cd azure
-.\Start-AzCortexOnboarding.ps1 -TemplateFile ./template.json -ParametersFile ./parameters.json
+.\Start-AzCortexOnboarding.ps1
 ```
 
 ---
