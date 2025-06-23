@@ -16,6 +16,9 @@ Parameters:
     Default: ""
     Description: (Optional) ARN of KMS key used to encrypt logs
 
+Conditions:
+  HasKMSKey: !Not [!Equals [!Ref KMSKeyARN, ""]]
+
 Resources:
 
   CortexS3IngestQueue:
@@ -75,13 +78,16 @@ Resources:
                   - sqs:GetQueueAttributes
                   - sqs:ChangeMessageVisibility
                 Resource: !GetAtt CortexS3IngestQueue.Arn
-              - Effect: Allow
-                Action:
-                  - kms:Decrypt
-                Resource: !Ref KMSKeyARN
-                Condition:
-                  StringNotEqualsIfExists:
-                    kms:ViaService: "s3.${AWS::Region}.amazonaws.com"
+              - !If
+                - HasKMSKey
+                - Effect: Allow
+                  Action:
+                    - kms:Decrypt
+                  Resource: !Ref KMSKeyARN
+                  Condition:
+                    StringNotEqualsIfExists:
+                      kms:ViaService: !Sub "s3.${AWS::Region}.amazonaws.com"
+                - !Ref "AWS::NoValue"
 
 Outputs:
   SQSQueueURL:
