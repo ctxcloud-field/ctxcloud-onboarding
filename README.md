@@ -75,9 +75,9 @@ cd azure
 
 ---
 
-### `Start-AzCortexOnboarding.ps1`
+### [DRAFT] `Start-AzCortexOnboarding.ps1` 
 
-This script is the **PowerShell equivalent** of the onboarding wizard’s default `main.sh`. It validates the environment and deploys the **ARM template** for Cortex Cloud onboarding.
+This script is very much in DRAFT state, and still a work-in-progress. This script is the **PowerShell equivalent** of the onboarding wizard’s default `main.sh`. It validates the environment and deploys the **ARM template** for Cortex Cloud onboarding.
 
 **Requirements:**
 
@@ -99,7 +99,7 @@ cd azure
 
 ### `cortex-xsiam-s3-collector.yaml`
 
-CloudFormation template for setting up the **S3 + SQS + IAM role** integration needed to forward **CloudTrail logs to Cortex XSIAM**.
+CloudFormation template for setting up the **S3 + SQS + IAM role** integration needed to forward **CloudTrail logs to Cortex XSIAM**. This version presumes that you have an existing S3 bucket for CloudTrail logging already setup. As well, conditional logic has been updated for KMS Key ARN.
 
 **Resources Deployed:**
 
@@ -136,7 +136,7 @@ These scripts were written by [@adilio](https://github.com/adilio) as part of te
 Contributions are welcome!
 
 * Open [issues](https://github.com/ctxcloud-field/ctxcloud-onboarding/issues) or submit [pull requests](https://github.com/ctxcloud-field/ctxcloud-onboarding/pulls)
-* If you’re a **Palo Alto Networks** colleague, feel free to reach out to **@adilio internally** if you’d like to collaborate
+* If you’re a **Palo Alto Networks** colleague, feel free to reach out to **Adil L internally** if you’d like to collaborate
 
 ---
 
