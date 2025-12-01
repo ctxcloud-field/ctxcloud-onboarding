@@ -1,4 +1,4 @@
-# ☁️ ctxcloud-onboarding
+# ctxcloud-onboarding
 
 Scripts to streamline and validate onboarding for **Cortex Cloud** by **Palo Alto Networks**, supporting both **Azure** and **AWS** environments.
 
@@ -8,7 +8,7 @@ These tools help validate permissions, resource provider registrations, diagnost
 
 ---
 
-## 📁 Structure
+## Structure
 
 ```
 ctxcloud-onboarding/
@@ -25,7 +25,7 @@ ctxcloud-onboarding/
 
 ---
 
-## 🧪 Azure Onboarding: cc-permissions-preflight
+## Azure Onboarding: cc-permissions-preflight
 
 Use the consolidated **cc-permissions-preflight** script from Palo Alto Networks for Azure onboarding and preflight checks.
 
@@ -48,7 +48,7 @@ The PowerShell and Bash scripts in `azure/` remain checked in for historical ref
 
 ---
 
-## ☁️ AWS Onboarding: Cortex XSIAM Log Collector
+## AWS Onboarding: Cortex XSIAM Log Collector
 
 ### `cortex-xsiam-s3-collector.yaml`
 
@@ -69,14 +69,14 @@ CloudFormation template for setting up the **S3 + SQS + IAM role** integration n
 
 ---
 
-## 🔐 Requirements
+## Requirements
 
 * **Azure**: Must be logged in (`az login` or `Connect-AzAccount`), with permissions at both Subscription and Management Group scope
 * **AWS**: Admin access to the account that owns the CloudTrail bucket
 
 ---
 
-## 🙋‍♂️ Author & Support
+## Author & Support
 
 These scripts were written by [@adilio](https://github.com/adilio) as part of testing and troubleshooting Cortex Cloud onboarding.
 
@@ -84,7 +84,7 @@ These scripts were written by [@adilio](https://github.com/adilio) as part of te
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome!
 
@@ -93,6 +93,6 @@ Contributions are welcome!
 
 ---
 
-## 📄 License
+## License
 
 Licensed under the [MIT License](./LICENSE).
