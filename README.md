@@ -4,6 +4,8 @@ Scripts to streamline and validate onboarding for **Cortex Cloud** by **Palo Alt
 
 These tools help validate permissions, resource provider registrations, diagnostic settings, and deployment readiness for Cortex Cloud’s **Cloud Posture Security**, **Cloud Runtime Security**, and XSIAM's **S3 Bucket log collection** modules.
 
+> ℹ️ **Azure onboarding has moved** to the consolidated `cc-permissions-preflight` script. The PowerShell/Bash scripts in `azure/` are now deprecated and kept only for reference.
+
 ---
 
 ## 📁 Structure
@@ -12,86 +14,37 @@ These tools help validate permissions, resource provider registrations, diagnost
 ctxcloud-onboarding/
 ├── aws/
 │   └── cortex-xsiam-s3-collector.yaml        # CloudFormation template for XSIAM S3 log ingestion
-├── azure/
-│   ├── az-runtime-perms-check.sh             # Bash-based Runtime permission checker
-│   ├── Start-AzCortexOnboarding.ps1          # PowerShell deployment script using wizard template
-│   ├── Test-AzCortexProviders.ps1            # Provider registration validation
-│   └── Test-AzCortexRuntimePermissions.ps1   # RBAC + permission analysis
+├── azure/ (deprecated, archived for reference)
+│   ├── deprecated-az-runtime-perms-check.sh
+│   ├── deprecated-Start-AzCortexOnboarding.ps1
+│   ├── deprecated-Test-AzCortexProviders.ps1
+│   └── deprecated-Test-AzCortexRuntimePermissions.ps1
 ├── LICENSE
 └── README.md
 ```
 
 ---
 
-## 🧪 Azure Onboarding Scripts
+## 🧪 Azure Onboarding: cc-permissions-preflight
 
-### `az-runtime-perms-check.sh` (Bash)
+Use the consolidated **cc-permissions-preflight** script from Palo Alto Networks for Azure onboarding and preflight checks.
 
-Checks whether the current Azure CLI user:
-
-* Is a **Global Administrator** in Entra ID
-* Has role assignments at both **Subscription** and **Root Management Group**
-* Has wildcard permissions across services required by **Cortex Runtime Security**
-* Has all required **Azure Resource Providers** registered
+* GitHub repo: https://github.com/PaloAltoNetworks/cc-permissions-preflight
+* Latest script (raw): https://raw.githubusercontent.com/PaloAltoNetworks/cc-permissions-preflight/refs/heads/main/preflight_check.sh
 
 **Usage:**
 
 ```bash
-cd azure
-bash az-runtime-perms-check.sh
+# run the latest preflight check
+curl -fsSL https://raw.githubusercontent.com/PaloAltoNetworks/cc-permissions-preflight/refs/heads/main/preflight_check.sh -o preflight_check.sh
+bash preflight_check.sh
 ```
 
-> Designed for Bash 3.x (e.g., macOS default). No jq or external dependencies required.
+The script validates Azure permissions (subscription + management group scopes), required resource providers, and other runtime prerequisites needed for Cortex Cloud onboarding.
 
----
+### Deprecated Azure scripts (archived)
 
-### `Test-AzCortexRuntimePermissions.ps1`
-
-PowerShell version of the runtime permissions checker. It:
-
-* Validates wildcard access to critical Azure services
-* Checks roles assigned at both subscription and management group level
-* Can be extended to export results
-
-**Usage:**
-
-```powershell
-cd azure
-.\Test-AzCortexRuntimePermissions.ps1
-```
-
----
-
-### `Test-AzCortexProviders.ps1`
-
-Checks if required Azure **Resource Providers** are registered (e.g., `Microsoft.Compute`, `Microsoft.Storage`, etc.). Optionally prompts to register missing providers.
-
-**Usage:**
-
-```powershell
-cd azure
-.\Test-AzCortexProviders.ps1
-```
-
----
-
-### [DRAFT] `Start-AzCortexOnboarding.ps1` 
-
-This script is very much in DRAFT state, and still a work-in-progress. This script is the **PowerShell equivalent** of the onboarding wizard’s default `main.sh`. It validates the environment and deploys the **ARM template** for Cortex Cloud onboarding.
-
-**Requirements:**
-
-* `template.json` – downloaded from the Cortex Cloud onboarding wizard
-* `parameters.json` – also from the wizard
-
-> ✅ **For convenience**, copy both `template.json` and `parameters.json` into the same directory as this script before running.
-
-**Usage:**
-
-```powershell
-cd azure
-.\Start-AzCortexOnboarding.ps1
-```
+The PowerShell and Bash scripts in `azure/` remain checked in for historical reference but are not maintained. Filenames are prefixed with `deprecated-` to discourage use. Prefer the `cc-permissions-preflight` script above for all Azure onboarding and validation needs.
 
 ---
 
